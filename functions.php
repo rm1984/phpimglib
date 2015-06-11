@@ -166,4 +166,42 @@ function getHistogram($image, $type = LUMINANCE)
 
 	echo "<img src='data:image/jpeg;base64," . base64_encode($i) . "'/>";
 }
+
+/*
+ * Gets the dominant color of an image.
+ * [COOL TIP] To boost up the colors in a photo, get its dominant color and then, with a tool like PhotoShop or the GIMP, create a new layer filled with that color, invert it and set the blend mode to "Overlay".
+ * 
+ * @param resource $image The image resource
+ * @return array (r, g, b)
+ */
+function getDominantColor($image)
+{
+	$rTotal = 0;
+	$gTotal = 0;
+	$bTotal = 0;
+	$total = 0;
+
+    for ($x = 0; $x < imagesx($image); $x++)
+    {
+        for ($y = 0; $y < imagesy($image); $y++)
+        {
+            $rgb = imagecolorat($image, $x, $y);
+            $r = ($rgb >> 16) & 0xFF;
+            $g = ($rgb >> 8) & 0xFF;
+            $b = $rgb & 0xFF;
+            $rTotal += $r;
+            $gTotal += $g;
+            $bTotal += $b;
+            $total++;
+        }
+    }
+
+    $rAverage = round($rTotal / $total);
+    $gAverage = round($gTotal / $total);
+    $bAverage = round($bTotal / $total);
+
+	return array($rAverage, $gAverage, $bAverage);
+}
+
+
 ?>

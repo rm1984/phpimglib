@@ -17,6 +17,7 @@
 
 	$mimetype = getImageMIMEType($filename_image);
 	list($width, $height) = getImageWidthAndHeight($image);
+	list($dom_r, $dom_g, $dom_b) = getDominantColor($image);
 ?>
 			<tr>
 				<td class="test_table_row">Image</td>
@@ -42,11 +43,15 @@
 				<td class="test_table_row">Histogram (based on black and white)</td>
 				<td class="test_table_row"><?php getHistogram($image, BLACKWHITE); ?></td>
 			</tr>
+			<tr>
+				<td class="test_table_row">Dominant color</td>
+				<td class="test_table_row"><div class="foo" style="background-color: <?php echo "rgb(" . $dom_r . ", " . $dom_g . ", " . $dom_b . ");"; ?>"><?php echo "RGB (" . $dom_r . ", " . $dom_g . ", " . $dom_b . ")"; ?></div></td>
+			</tr>
 		</table>
-
+		<br/>
 		<table class="test_table">
 			<tr>
-				<th colspan="2" class="test_table_row">Test 1</th>
+				<th colspan="2" class="test_table_row">Test 2</th>
 			</tr>
 <?php
 	$filename_image = "image2.png";
