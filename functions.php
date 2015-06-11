@@ -203,5 +203,91 @@ function getDominantColor($image)
 	return array($rAverage, $gAverage, $bAverage);
 }
 
+function createImageFilledWithColor($width, $height, $r, $g, $b)
+{
+	$image = imagecreatetruecolor($width, $height);
+	$color = imagecolorallocate($image, $r, $g, $b);
+
+	imagefill($image, 0, 0, $color);
+
+	return $image;
+}
+
+function overlay($lower_layer_image, $upper_layer_image)
+{
+    for ($x = 0; $x < imagesx($lower_layer_image); $x++)
+    {
+        for ($y = 0; $y < imagesy($lower_layer_image); $y++)
+        {
+            $lower_rgb = imagecolorat($lower_layer_image, $x, $y);
+            $lower_r = ($lower_rgb >> 16) & 0xFF;
+            $lower_g = ($lower_rgb >> 8) & 0xFF;
+            $lower_b = $lower_rgb & 0xFF;
+
+            $upper_rgb = imagecolorat($upper_layer_image, $x, $y);
+            $upper_r = ($upper_rgb >> 16) & 0xFF;
+            $upper_g = ($upper_rgb >> 8) & 0xFF;
+            $upper_b = $upper_rgb & 0xFF;
+
+			// red channel
+			if ($lower_r > 127.5)
+			{
+				$value_unit_r = (255 - $lower_r) / 127.5;
+				$min_value_r = $lower_r - (255 - $lower_r);
+				$overlay_r = ($upper_r * $value_unit_r) + $min_value_r;
+			}
+			else if ($lower_r < 127.5)
+			{
+				$value_unit_r = $lower_r / 127.5;
+				$overlay_r = ($upper_r * $value_unit_r);
+			}
+
+			// green channel
+			if ($lower_g > 127.5)
+			{
+				$value_unit_g = (255 - $lower_g) / 127.5;
+				$min_value_g = $lower_g - (255 - $lower_g);
+				$overlay_g = ($upper_g * $value_unit_g) + $min_value_g;
+			}
+			else if ($lower_g < 127.5)
+			{
+				$value_unit_g = $lower_g / 127.5;
+				$overlay_g = ($upper_g * $value_unit_g);
+			}
+
+			// blue channel
+			if ($lower_b > 127.5)
+			{
+				$value_unit_b = (255 - $lower_b) / 127.5;
+				$min_value_b = $lower_b - (255 - $lower_b);
+				$overlay_b = ($upper_b * $value_unit_b) + $min_value_b;
+			}
+			else if ($lower_b < 127.5)
+			{
+				$value_unit_b = $lower_b / 127.5;
+				$overlay_b = ($upper_b * $value_unit_b);
+			}
+        }
+    }
+}
+
+function boost($image)
+{
+	list($width, $height) = getImageWidthAndHeight($image);
+	list($r, $g, $b) = getDominantColor($image);
+
+	$colored_image = createImageFilledWithColor($width, $height, $r, $g, $b);
+	$overlay = overlay($image, $colored_image);
+
+	ob_start();
+
+	imagejpeg($overlay, NULL, 100);
+	imagedestroy($overlay);
+
+	$i = ob_get_clean();
+
+	echo "<img src='data:image/jpeg;base64," . base64_encode($i) . "'/>";
+}
+
 
 ?>
