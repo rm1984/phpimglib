@@ -215,9 +215,13 @@ function createImageFilledWithColor($width, $height, $r, $g, $b)
 
 function overlay($lower_layer_image, $upper_layer_image)
 {
-    for ($x = 0; $x < imagesx($lower_layer_image); $x++)
+	$width = imagesx($lower_layer_image);
+	$height = imagesy($lower_layer_image);
+	$overlay = imagecreatetruecolor($width, $height);
+
+    for ($x = 0; $x < $width; $x++)
     {
-        for ($y = 0; $y < imagesy($lower_layer_image); $y++)
+        for ($y = 0; $y < $height; $y++)
         {
             $lower_rgb = imagecolorat($lower_layer_image, $x, $y);
             $lower_r = ($lower_rgb >> 16) & 0xFF;
@@ -267,8 +271,25 @@ function overlay($lower_layer_image, $upper_layer_image)
 				$value_unit_b = $lower_b / 127.5;
 				$overlay_b = ($upper_b * $value_unit_b);
 			}
+
+			$pixel = imagecolorallocate($overlay, $overlay_r, $overlay_g, $overlay_b);
+
+			imagesetpixel($overlay, $x, $y, $pixel);
         }
     }
+
+/*
+	ob_start();
+
+	imagejpeg($overlay, NULL, 100);
+	imagedestroy($overlay);
+
+	$i = ob_get_clean();
+
+	echo "<img src='data:image/jpeg;base64," . base64_encode($i) . "'/>";
+*/
+
+	return $overlay;
 }
 
 function boost($image)
